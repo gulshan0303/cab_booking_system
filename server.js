@@ -32,6 +32,10 @@ app.use('/api/v1/payment', paymentRoutes);
 //error middleware
 app.use(ErrorMiddleware);
 
+app.get("/",(req,res,next) => {
+   res.status(200).json({message:"Server is running"})
+})
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
