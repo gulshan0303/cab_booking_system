@@ -1,11 +1,12 @@
 const Wallet = require('../models/wallet');
 const User = require('../models/user');
+const ErrorHandler = require('../utils/ErrorHandler');
 
-const checkBalance = async (req, res) => {
+const checkBalance = async (req, res,next) => {
   try {
     const wallet = await Wallet.findOne({ user: req.user.id });
-    if (!wallet) return res.status(404).json({ msg: 'Wallet not found' });
-    res.json({ balance: wallet.balance });
+    if (!wallet) return next(new ErrorHandler("Wallet not found",404))
+    res.status(200).json({success:true,message:"Wallet Details", balance: wallet.balance });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -19,7 +20,7 @@ const addFunds = async (req, res) => {
   }
 
   try {
-    const userId = req.user.id || req.user; // Ensure we have the user ID from the request
+    const userId = req.user.id || req.user;
     
     let wallet = await Wallet.findOne({ user: userId });
     if (!wallet) {
@@ -30,7 +31,7 @@ const addFunds = async (req, res) => {
 
     await User.findByIdAndUpdate(userId, { $inc: { walletBalance: amount } });
 
-    res.json(wallet);
+    res.status(200).json({success:true,message:"Balance added successfully",wallet});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
